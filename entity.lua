@@ -4,12 +4,9 @@ local bint = require('.bint')(256)
 
 if not Components then Components = {} end;
 
-local balancePattern = { Action = "Balance", Key = "Balances", Tags = { "Recipient", "From" } };
-
 Component = {
-    write = { "Transfer", "Mint", "Init" },
-    read = {balancePattern},
-    Target = "Mq-EhTkmZ5nSBmnqzp3vl_d35WwMTGphtk90Z7wVr-o",
+    Handlers = { "Transfer", "Mint", "Init" },
+    system = "Mq-EhTkmZ5nSBmnqzp3vl_d35WwMTGphtk90Z7wVr-o",
     Title = "Token Component",
     Description = "This component provides your process the ability to act as a fungible token",
     Data = {
@@ -30,30 +27,15 @@ Handlers.add("AddComponent", Handlers.utils.hasMatchingTag('Action', "AddCompone
 end)
 
 function AddComponent(_component)
-    for i, v in ipairs(_component.write) do
+    for i, v in ipairs(_component.Handlers) do
         Handlers.add(v, Handlers.utils.hasMatchingTag('Action', v), function(msg)
             ao.send({
-                Target = _component.Target,
+                Target = _component.system,
                 Action = v,
                 Data = json.encode(_component.Data),
                 Tags = msg.Tags,
                 Sender = msg.From
             });
-        end)
-    end
-    for i, v in ipairs(_component.read) do
-        Handlers.add(v.Action, Handlers.utils.hasMatchingTag('Action', v.Action), function(msg)
-            --get component
-            local data = _component.Data[v.Key]
-            for i, v in ipairs(v.Tags) do
-                if(msg[v]) then
-                    ao.send({
-                        Target = msg.From,
-                        Data = data[msg[v]]
-                    })
-                    return 
-                end
-            end;
         end)
     end
 end
