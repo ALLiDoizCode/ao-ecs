@@ -2,37 +2,90 @@ local json = require('json');
 local ao = require('ao');
 local bint = require('.bint')(256)
 
+if not EntityId then EntityId = 1 end;
+if not ComponentId then ComponentId = 1 end;
+
 if not Components then Components = {} end;
+if not Entitys then Entitys = {} end;
 
-Component = {
-    Handlers = { "Transfer", "Mint", "Init" },
-    system = "Mq-EhTkmZ5nSBmnqzp3vl_d35WwMTGphtk90Z7wVr-o",
-    Title = "Token Component",
-    Description = "This component provides your process the ability to act as a fungible token",
-    Data = {
-        Balances = { [ao.id] = "100000000000000000" },
-        Minter = "UOI4I9LmzHkobEIvs52vzY4SWk9FPi7JiYSHe4ZGmCI",
-        Denomination = 8,
-        TotalSupply = 0,
-        Name = "Swappy",
-        Ticker = "SWAP",
-        Logo = "-RmetHQufxWySiJact95a9ON6pb-0s56dElmyJusGwQ",
-        Description = "Test token for Swappy"
-    }
-};
-
-Handlers.add("AddComponent", Handlers.utils.hasMatchingTag('Action', "AddComponent"), function(msg)
-    --local component = json.decode(msg.Data);
-    AddComponent(Component);
+Handlers.add("CreateEntity", Handlers.utils.hasMatchingTag('Action', "CreateEntity"), function(msg)
+    local currentId = tostring(EntityId);
+    EntityId = EntityId + 1;
+    Entitys[currentId] = msg.From;
 end)
 
-function AddComponent(_component)
-    for i, v in ipairs(_component.Handlers) do
+Handlers.add("AddComponent", Handlers.utils.hasMatchingTag('Action', "AddComponent"), function(msg)
+    local currentId = tostring(ComponentId);
+    ComponentId = ComponentId + 1;
+    local tokenComponent = TokenComponent(currentId, msg.Entity, msg.Minter, msg.Denomination, msg.Name, msg.Ticker, msg.Logo, msg.Description);
+    AddComponent(tokenComponent);
+end)
+
+Handlers.add("Credit-Notice", Handlers.utils.hasMatchingTag('Action', "Credit-Notice"), function(msg)
+    local data = json.decode(msg.Data);
+    Components[data.Id] = data;
+end)
+
+Handlers.add("Debit-Notice", Handlers.utils.hasMatchingTag('Action', "Debit-Notice"), function(msg)
+    local data = json.decode(msg.Data);
+    Components[data.Id] = data;
+end)
+
+Handlers.add("Mint-Notice", Handlers.utils.hasMatchingTag('Action', "Mint-Notice"), function(msg)
+    local data = json.decode(msg.Data);
+    Components[data.Id] = data;
+end)
+
+Handlers.add("Burn-Notice", Handlers.utils.hasMatchingTag('Action', "Burn-Notice"), function(msg)
+    local data = json.decode(msg.Data);
+    Components[data.Id] = data;
+end)
+
+Handlers.add("Entitys", Handlers.utils.hasMatchingTag('Action', "Entitys"), function(msg)
+    ao.send({
+        Target = msg.From,
+        Data = json.encode(Entitys),
+    });
+end)
+
+Handlers.add("Components", Handlers.utils.hasMatchingTag('Action', "Components"), function(msg)
+    ao.send({
+        Target = msg.From,
+        Data = json.encode(Components),
+    });
+end)
+
+function TokenComponent(Id,Entity, Minter, Denomination, Name, Ticker, Logo, Description)
+    local Component = {
+        Handlers = { "Transfer", "Mint", "Burn" },
+        System = "Mq-EhTkmZ5nSBmnqzp3vl_d35WwMTGphtk90Z7wVr-o",
+        Title = "Token Component",
+        Description = "This component provides your process the ability to act as a fungible token",
+        Data = {
+            Entity = Entity,
+            Id = Id,
+            Balances = {},
+            Minter = Minter,
+            Denomination = Denomination,
+            TotalSupply = "0",
+            Name = Name,
+            Ticker = Ticker,
+            Logo = Logo,
+            Description = Description
+        }
+    };
+
+    return Component
+end
+
+function AddComponent(component)
+    Components[component.Data.Id] = component;
+    for i, v in ipairs(component.Handlers) do
         Handlers.add(v, Handlers.utils.hasMatchingTag('Action', v), function(msg)
             ao.send({
-                Target = _component.system,
+                Target = component.System,
                 Action = v,
-                Data = json.encode(_component.Data),
+                Data = json.encode(component.Data),
                 Tags = msg.Tags,
                 Sender = msg.From
             });
