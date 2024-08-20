@@ -1,3 +1,11 @@
+
+---
+
+**Entity Component System (ECS) on AO Computer**  
+A high-performance ECS framework built for the AO computer, leveraging AOS's hyper-parallel blockchain. This project explores modularity and statelessness in ECS to create scalable Web3 applications, enabling a decentralized app store where components and systems function as independent, reusable apps.
+
+---
+
 # Entity Component System (ECS) on AO Computer
 
 ## Introduction
