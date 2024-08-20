@@ -3,7 +3,6 @@ local ao = require('ao');
 local bint = require('.bint')(256)
 
 if not ComponentId then ComponentId = 1 end;
-
 if not Components then Components = {} end;
 
 Handlers.add("AddComponent", Handlers.utils.hasMatchingTag('Action', "AddComponent"), function(msg)
@@ -17,11 +16,8 @@ end)
 
 Handlers.add("RemoveComponent", Handlers.utils.hasMatchingTag('Action', "RemoveComponent"), function(msg)
     assert(msg.From == Owner,"Not Authorized");
-    local component = Components[msg.Id]
-    for i, v in ipairs(component.Handlers) do
-        Handlers.remove(v)
-    end
-    Components[msg.Id] = {}
+    local component = Components[msg.Id];
+    RemoveComponent(component);
 end)
 
 Handlers.add("Components", Handlers.utils.hasMatchingTag('Action', "Components"), function(msg)
@@ -30,6 +26,7 @@ Handlers.add("Components", Handlers.utils.hasMatchingTag('Action', "Components")
         Data = json.encode(Components),
     });
 end)
+
 function AddComponent(component)
     Components[component.Data.Id] = component;
     for i, v in ipairs(component.Handlers) do
@@ -50,4 +47,9 @@ function AddComponent(component)
     end
 end
 
-
+function RemoveComponent(component)
+    for i, v in ipairs(component.Handlers) do
+        Handlers.remove(v)
+    end
+    Components[msg.Id] = {}
+end
