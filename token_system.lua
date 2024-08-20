@@ -17,7 +17,6 @@ local utils = {
     end
 }
 
-
 Handlers.add('transfer', Handlers.utils.hasMatchingTag('Action', 'Transfer'), function(msg)
     assert(type(msg.Recipient) == 'string', 'Recipient is required!')
     assert(type(msg.Quantity) == 'string', 'Quantity is required!')
