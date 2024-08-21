@@ -27,6 +27,14 @@ Handlers.add("Components", Handlers.utils.hasMatchingTag('Action', "Components")
     });
 end)
 
+Handlers.add("Component", Handlers.utils.hasMatchingTag('Action', "Component"), function(msg)
+    local component = Components[msg.Id];
+    ao.send({
+        Target = msg.From,
+        Data = json.encode(component),
+    });
+end)
+
 function AddComponent(component)
     Components[component.Data.Id] = component;
     for i, v in ipairs(component.Handlers) do
@@ -51,5 +59,5 @@ function RemoveComponent(component)
     for i, v in ipairs(component.Handlers) do
         Handlers.remove(v)
     end
-    Components[msg.Id] = {}
+    Components[component.Id] = {}
 end
