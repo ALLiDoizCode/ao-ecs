@@ -47,9 +47,7 @@ This approach not only revolutionizes how apps are developed and used in a Web3 
 
 ## Getting Started
 
-*Coming Soon*
-
-This section will include detailed instructions on how to set up and use ECS on the AO computer, along with examples and best practices.
+[Protocol](./rfcs/Protocol.md)
 
 ---
 

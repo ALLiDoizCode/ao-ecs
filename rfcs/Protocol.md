@@ -12,11 +12,8 @@ This document provides the design guidelines for implementing and integrating th
     - [Components](#components)
     - [Systems](#systems)
 3. [Integration with AOS](#integration-with-aos)
-4. [Lua Integration](#lua-integration)
-5. [Parallel Processing with AOS](#parallel-processing-with-aos)
-6. [Web3 App Store Integration](#web3-app-store-integration)
-7. [Example Implementation](#example-implementation)
-8. [Testing and Debugging](#testing-and-debugging)
+4. [Web3 App Store Integration](#web3-app-store-integration)
+5. [Testing and Debugging](#testing-and-debugging)
 
 ---
 
