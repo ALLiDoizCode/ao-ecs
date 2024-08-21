@@ -51,5 +51,5 @@ function RemoveComponent(component)
     for i, v in ipairs(component.Handlers) do
         Handlers.remove(v)
     end
-    Components[msg.Id] = {}
+    Components[component.Id] = {}
 end
